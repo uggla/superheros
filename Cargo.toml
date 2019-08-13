@@ -1,0 +1,17 @@
+[package]
+authors = ["Uggla <uggla@free.fr>"]
+edition = "2018"
+name = "superheros"
+version = "0.1.0"
+[dependencies]
+actix = "*"
+actix-web = "*"
+dotenv = "*"
+futures = "*"
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
+
+[dependencies.diesel]
+features = ["postgres"]
+version = "1.4.2"
