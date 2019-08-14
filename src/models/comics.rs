@@ -1,4 +1,7 @@
+use crate::db_connection::establish_connection;
 use crate::schema::comics;
+use diesel::QueryDsl;
+use diesel::RunQueryDsl;
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct Comics {
@@ -13,11 +16,7 @@ pub struct ComicsList(pub Vec<Comics>);
 
 impl ComicsList {
     pub fn list() -> Self {
-        use crate::db_connection::establish_connection;
         use crate::schema::comics::dsl::*;
-        //use diesel::QueryDsl;
-        use diesel::RunQueryDsl;
-
         let connection = establish_connection();
 
         let result = comics
@@ -31,10 +30,6 @@ impl ComicsList {
 
 impl Comics {
     pub fn find(id: &i32) -> Result<Comics, diesel::result::Error> {
-        use crate::db_connection::establish_connection;
-        use diesel::QueryDsl;
-        use diesel::RunQueryDsl;
-
         let connection = establish_connection();
 
         comics::table.find(id).first(&connection)
