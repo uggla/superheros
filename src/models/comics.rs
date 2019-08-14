@@ -28,3 +28,15 @@ impl ComicsList {
         ComicsList(result)
     }
 }
+
+impl Comics {
+    pub fn find(id: &i32) -> Result<Comics, diesel::result::Error> {
+        use crate::db_connection::establish_connection;
+        use diesel::QueryDsl;
+        use diesel::RunQueryDsl;
+
+        let connection = establish_connection();
+
+        comics::table.find(id).first(&connection)
+    }
+}

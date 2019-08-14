@@ -22,6 +22,9 @@ fn main() {
     HttpServer::new(|| {
         App::new()
             .service(web::resource("/Comics").route(web::get().to_async(handlers::comics::index)))
+            .service(
+                web::resource("/Comics/{id}").route(web::get().to_async(handlers::comics::show)),
+            )
     })
     .bind("127.0.0.1:8088")
     .unwrap()
