@@ -79,7 +79,6 @@ pub struct CharactersList(pub Vec<Characters>);
 
 impl CharactersList {
     pub fn list() -> Self {
-        //use crate::schema::characters::dsl::*;
         let connection = establish_connection();
 
         let result = characters::table
