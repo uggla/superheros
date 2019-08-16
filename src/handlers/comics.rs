@@ -27,7 +27,7 @@ pub fn comics_index(_req: HttpRequest) -> HttpResponse {
 }
 
 pub fn comics_show(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
-    info!("Request comics id");
+    info!("Request comics id: {}", &id);
     Comics::find(&id)
         .map(|product| HttpResponse::Ok().json(product))
         .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
