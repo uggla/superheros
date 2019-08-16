@@ -60,17 +60,79 @@ pub struct CharactersStats {
     pub total: i32,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct CharactersStatsResult {
+    pub name: String,
+    pub alignment: String,
+    pub intelligence: i32,
+    pub strengh: i32,
+    pub speed: i32,
+    pub durability: i32,
+    pub power: i32,
+    pub combat: i32,
+    pub total: i32,
+}
+
+impl CharactersStatsResult {
+    pub fn new(
+        name: String,
+        alignment: String,
+        intelligence: i32,
+        strengh: i32,
+        speed: i32,
+        durability: i32,
+        power: i32,
+        combat: i32,
+        total: i32,
+    ) -> CharactersStatsResult {
+        CharactersStatsResult {
+            name,
+            alignment,
+            intelligence,
+            strengh,
+            speed,
+            durability,
+            power,
+            combat,
+            total,
+        }
+    }
+}
+
 impl Characters {
-    pub fn find() -> Result<Vec<(String, String, i32)>, diesel::result::Error> {
+    pub fn find() -> Result<Vec<CharactersStatsResult>, diesel::result::Error> {
         let connection = establish_connection();
-        characters::table
+        let mut result = vec![];
+        let data = characters::table
             .inner_join(characters_stats::table.on(characters_stats::name.eq(characters::name)))
             .select((
                 characters::name,
                 characters_stats::alignment,
+                characters_stats::intelligence,
+                characters_stats::strengh,
+                characters_stats::speed,
+                characters_stats::durability,
+                characters_stats::power,
+                characters_stats::combat,
                 characters_stats::total,
             ))
-            .load(&connection)
+            .load(&connection);
+        for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
+            data.unwrap()
+        {
+            result.push(CharactersStatsResult::new(
+                name,
+                alignment,
+                intelligence,
+                strengh,
+                speed,
+                durability,
+                power,
+                combat,
+                total,
+            ));
+        }
+        Ok(result)
     }
 }
 
