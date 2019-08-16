@@ -28,8 +28,12 @@ fn main() {
                     .route(web::get().to_async(handlers::comics::comics_show)),
             )
             .service(
-                web::resource("/Characters")
+                web::resource("/Characters/list")
                     .route(web::get().to_async(handlers::comics::characters_index)),
+            )
+            .service(
+                web::resource("/Characters")
+                    .route(web::get().to_async(handlers::comics::characters_stats)),
             )
     })
     .bind("127.0.0.1:8088")

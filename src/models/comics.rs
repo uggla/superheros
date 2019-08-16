@@ -47,6 +47,33 @@ pub struct Characters {
     pub name: String,
 }
 
+#[derive(Queryable, Serialize, Deserialize)]
+pub struct CharactersStats {
+    pub id: i32,
+    pub name: String,
+    pub alignment: String,
+    pub intelligence: i32,
+    pub strengh: i32,
+    pub durability: i32,
+    pub power: i32,
+    pub combat: i32,
+    pub total: i32,
+}
+
+impl Characters {
+    pub fn find() -> Result<Vec<(String, String, i32)>, diesel::result::Error> {
+        let connection = establish_connection();
+        characters::table
+            .inner_join(characters_stats::table.on(characters_stats::name.eq(characters::name)))
+            .select((
+                characters::name,
+                characters_stats::alignment,
+                characters_stats::total,
+            ))
+            .load(&connection)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct CharactersList(pub Vec<Characters>);
 
