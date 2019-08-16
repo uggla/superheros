@@ -61,7 +61,7 @@ pub struct CharactersStats {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct CharactersStatsResult {
+pub struct CharactersJoinedToCharactersStats {
     pub name: String,
     pub alignment: String,
     pub intelligence: i32,
@@ -73,7 +73,7 @@ pub struct CharactersStatsResult {
     pub total: i32,
 }
 
-impl CharactersStatsResult {
+impl CharactersJoinedToCharactersStats {
     pub fn new(
         name: String,
         alignment: String,
@@ -84,8 +84,8 @@ impl CharactersStatsResult {
         power: i32,
         combat: i32,
         total: i32,
-    ) -> CharactersStatsResult {
-        CharactersStatsResult {
+    ) -> CharactersJoinedToCharactersStats {
+        CharactersJoinedToCharactersStats {
             name,
             alignment,
             intelligence,
@@ -100,7 +100,7 @@ impl CharactersStatsResult {
 }
 
 impl Characters {
-    pub fn find() -> Result<Vec<CharactersStatsResult>, diesel::result::Error> {
+    pub fn find() -> Result<Vec<CharactersJoinedToCharactersStats>, diesel::result::Error> {
         let connection = establish_connection();
         let mut result = vec![];
         let data = characters::table
@@ -120,7 +120,7 @@ impl Characters {
         for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
             data?
         {
-            result.push(CharactersStatsResult::new(
+            result.push(CharactersJoinedToCharactersStats::new(
                 name,
                 alignment,
                 intelligence,
