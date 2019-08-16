@@ -118,7 +118,7 @@ impl Characters {
             ))
             .load(&connection);
         for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
-            data.unwrap()
+            data?
         {
             result.push(CharactersStatsResult::new(
                 name,
