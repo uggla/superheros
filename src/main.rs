@@ -27,6 +27,10 @@ fn main() {
                 web::resource("/Comics/{id}")
                     .route(web::get().to_async(handlers::comics::comics_show)),
             )
+            .service(
+                web::resource("/Characters")
+                    .route(web::get().to_async(handlers::comics::characters_index)),
+            )
     })
     .bind("127.0.0.1:8088")
     .unwrap()

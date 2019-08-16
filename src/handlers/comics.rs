@@ -1,3 +1,5 @@
+//use crate::models::comics::Characters;
+use crate::models::comics::CharactersList;
 use crate::models::comics::Comics;
 use crate::models::comics::ComicsList;
 use actix_web::web;
@@ -11,4 +13,8 @@ pub fn comics_show(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
     Comics::find(&id)
         .map(|product| HttpResponse::Ok().json(product))
         .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+}
+
+pub fn characters_index(_req: HttpRequest) -> HttpResponse {
+    HttpResponse::Ok().json(CharactersList::list())
 }
