@@ -28,6 +28,7 @@ fn main() {
     info!("Superheros API !!!");
     HttpServer::new(|| {
         App::new()
+            //.data(pool.clone())
             .service(web::resource("/").route(web::get().to_async(handlers::comics::superheros)))
             .service(
                 web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_index)),
