@@ -54,7 +54,7 @@ pub fn add(
     db.send(ComicsList)
         .from_err()
         .and_then(move |res| match res {
-            Ok(comics_list) => Ok(HttpResponse::Ok().json(comics_list)),
+            Ok(comics_list) => Ok(HttpResponse::Ok().json(comics_list.comics_list)),
             Err(_) => Ok(HttpResponse::InternalServerError().into()),
         })
 }

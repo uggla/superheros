@@ -32,8 +32,9 @@ pub fn get_db_addr() -> Addr<ConnDsl> {
     let manager = ConnectionManager::<PgConnection>::new(database_url);
 
     let pool = Pool::builder()
+        .max_size(12)
         .build(manager)
         .expect("Failed to create pool.");
-
+    dbg!(num_cpus::get());
     SyncArbiter::start(num_cpus::get() * 3, move || ConnDsl(pool.clone()))
 }

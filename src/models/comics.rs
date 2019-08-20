@@ -37,14 +37,24 @@ pub struct ComicsListMsgs {
     pub comics_list: Vec<Comics>,
 }
 
+// impl From<r2d2::Error> for std::io::Error {
+//     fn from (_t:<r2d2::Error>) -> std::io::Error{
+//         std::io::Error
+//     }
+// }
+
 impl Handler<ComicsList> for ConnDsl {
     // type Result = Result<ComicsListMsgs, Error>;
     type Result = io::Result<ComicsListMsgs>;
 
-    fn handle(&mut self, comics_list: ComicsList, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, _comics_list: ComicsList, _: &mut Self::Context) -> Self::Result {
         // let conn = &self.0.get().map_err(error::ErrorInternalServerError)?;
-        let conn = &self.0.get().unwrap();
         use crate::schema::comics::dsl::*;
+        let conn = &self.0.get().unwrap();
+        // let conn = &self
+        //     .0
+        //     .get()
+        //     .map_err(|e| Err(io::Error::new(io::ErrorKind::Other, e)));
 
         let result = comics
             //.limit(10)
