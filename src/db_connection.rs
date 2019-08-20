@@ -1,12 +1,11 @@
+extern crate diesel;
 extern crate num_cpus;
-extern crate r2d2;
-extern crate r2d2_postgres;
-use actix::prelude::*;
-use actix::SyncArbiter;
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
+use crate::diesel::Connection;
+use actix::*;
+use diesel::prelude::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool};
+
 use dotenv::dotenv;
-use r2d2::Pool;
 use std::env;
 
 pub fn establish_connection() -> PgConnection {
@@ -16,25 +15,25 @@ pub fn establish_connection() -> PgConnection {
     // it will through a message "DATABASE_URL must be set"
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+    diesel::pg::PgConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}", database_url))
 }
 
-// This is db executor actor. We are going to run 3 of them in parallel.
-pub struct DbExecutor(pub Pool<r2d2_postgres::PostgresConnectionManager>);
+//  r2d2_diesel
+pub struct ConnDsl(pub Pool<ConnectionManager<PgConnection>>);
 
-impl Actor for DbExecutor {
+impl Actor for ConnDsl {
     type Context = SyncContext<Self>;
 }
 
-pub fn start_database() -> Addr<DbExecutor> {
+pub fn get_db_addr() -> Addr<ConnDsl> {
+    dotenv().ok(); // This will load our .env file.
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let manager =
-        r2d2_postgres::PostgresConnectionManager::new(database_url, r2d2_postgres::TlsMode::None)
-            .unwrap();
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
 
     let pool = Pool::builder()
         .build(manager)
         .expect("Failed to create pool.");
 
-    SyncArbiter::start(num_cpus::get() * 3, move || DbExecutor(pool.clone()))
+    SyncArbiter::start(num_cpus::get() * 3, move || ConnDsl(pool.clone()))
 }

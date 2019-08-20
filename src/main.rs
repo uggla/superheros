@@ -17,22 +17,29 @@ mod logger;
 pub mod models;
 pub mod schema;
 
+// use actix::Addr;
 use actix_web::{web, App, HttpServer};
 use log::LevelFilter;
 use logger::init_log;
+
+// struct Mydata {
+//     db: Addr<db_connection::ConnDsl>,
+// }
 
 fn main() {
     init_log(LevelFilter::Debug).expect("Error initializing logger");
 
     let sys = actix::System::new("superheros");
+    let db_addr = db_connection::get_db_addr();
+
     info!("Superheros API !!!");
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
-            //.data(pool.clone())
+            .data(db_addr.clone())
             .service(web::resource("/").route(web::get().to_async(handlers::comics::superheros)))
-            .service(
-                web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_index)),
-            )
+            // .service(
+            //     web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_index)),
+            // )
             .service(
                 web::resource("/Comics/{id}")
                     .route(web::get().to_async(handlers::comics::comics_show)),
@@ -45,6 +52,7 @@ fn main() {
                 web::resource("/Characters")
                     .route(web::get().to_async(handlers::comics::characters_stats)),
             )
+            .service(web::resource("/Comicspool").route(web::get().to_async(handlers::comics::add)))
     })
     .bind("0.0.0.0:8088")
     .unwrap()

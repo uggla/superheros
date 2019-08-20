@@ -1,12 +1,17 @@
 use crate::db_connection::establish_connection;
+use crate::db_connection::ConnDsl;
 use crate::schema::characters;
 use crate::schema::characters_stats;
 use crate::schema::characters_to_comics;
 use crate::schema::comics;
+use actix::Handler;
+use actix::Message;
+use actix_web::*;
 use diesel::ExpressionMethods;
 use diesel::JoinOnDsl;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
+use std::io;
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct Comics {
@@ -17,21 +22,56 @@ pub struct Comics {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct ComicsList(pub Vec<Comics>);
+// pub struct ComicsList(pub Vec<Comics>);
+pub struct ComicsList;
 
-impl ComicsList {
-    pub fn list() -> Self {
+impl Message for ComicsList {
+    // type Result = Result<ComicsListMsgs, Error>;
+    type Result = io::Result<ComicsListMsgs>;
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ComicsListMsgs {
+    pub status: i32,
+    pub message: String,
+    pub comics_list: Vec<Comics>,
+}
+
+impl Handler<ComicsList> for ConnDsl {
+    // type Result = Result<ComicsListMsgs, Error>;
+    type Result = io::Result<ComicsListMsgs>;
+
+    fn handle(&mut self, comics_list: ComicsList, _: &mut Self::Context) -> Self::Result {
+        // let conn = &self.0.get().map_err(error::ErrorInternalServerError)?;
+        let conn = &self.0.get().unwrap();
         use crate::schema::comics::dsl::*;
-        let connection = establish_connection();
 
         let result = comics
             //.limit(10)
-            .load::<Comics>(&connection)
+            .load::<Comics>(conn)
             .expect("Error loading comics");
 
-        ComicsList(result)
+        Ok(ComicsListMsgs {
+            status: 200,
+            message: "article_list result.".to_string(),
+            comics_list: result,
+        })
     }
 }
+
+//impl ComicsList {
+//    pub fn list() -> Self {
+//        use crate::schema::comics::dsl::*;
+//        let connection = establish_connection();
+
+//        let result = comics
+//            //.limit(10)
+//            .load::<Comics>(&connection)
+//            .expect("Error loading comics");
+
+//        ComicsList(result)
+//    }
+//}
 
 impl Comics {
     pub fn find(id: &i32) -> Result<Comics, diesel::result::Error> {
