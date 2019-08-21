@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+
+  postgres:
+    image: postgres
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: superheros
+      POSTGRES_PASSWORD: superheros
+      POSTGRES_DB: superheros
+    volumes:
+      - $PWD/data:/tmp/data
+
+
+  superheros:
+    build:
+      context: .
+    environment:
+      POSTGRES_USER: superheros
+      POSTGRES_PASSWORD: superheros
+      POSTGRES_DB: superheros
+      POSTGRES_HOST: postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+networks:
+  backend:
