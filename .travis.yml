@@ -1,0 +1,12 @@
+---
+  language: minimal
+  sudo: required
+  notifications:
+    email: true
+  services:
+    - docker
+  jobs:
+    include:
+      stage: Build
+      script:
+        - docker-compose up -d
