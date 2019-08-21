@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.3"
 services:
 
   postgres:
@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: superheros
       POSTGRES_DB: superheros
     volumes:
-      - $PWD/data:/tmp/data
+      - $PWD/data:/tmp/data # Used to load data
 
 
   superheros:
