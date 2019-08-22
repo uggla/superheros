@@ -24,7 +24,7 @@ COPY --from=builder /usr/local/src/superheros/target/release/superheros .
 COPY --from=builder /usr/local/src/superheros/target/release/bin/diesel .
 COPY migrations migrations
 COPY scripts/run.sh run.sh
-COPY Cargo.toml Cargo.toml # Needed by diesel_cli
+COPY Cargo.toml Cargo.toml
 RUN chown -R superheros:superheros /home/superheros \
     && chmod +x ./run.sh
 USER superheros
