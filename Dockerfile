@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libmariadb3 \
     libpq5 \
     libsqlite3-0 \
+    netcat \
     && rm -rf /var/lib/apt/lists/*
 RUN groupadd -g 1000 superheros \
     && useradd -u 1000 -g 1000 -s /bin/bash -m superheros
