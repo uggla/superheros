@@ -22,7 +22,7 @@ services:
       POSTGRES_DB: superheros
       POSTGRES_HOST: postgres
     ports:
-      - "8080:8080"
+      - "8088:8088"
     networks:
       - backend
     depends_on:

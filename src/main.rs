@@ -45,7 +45,7 @@ fn main() {
                     .route(web::get().to_async(handlers::comics::characters_stats)),
             )
     })
-    .bind("127.0.0.1:8088")
+    .bind("0.0.0.0:8088")
     .unwrap()
     .start();
 
