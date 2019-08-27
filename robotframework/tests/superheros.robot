@@ -13,8 +13,6 @@ Get Comics id
     Should Be Equal As Strings  ${resp.status_code}  200
     ${json_from_file}=  evaluate  json.loads(open("/opt/robotframework/tests/Comics.json", "r").read())  json
     ${json_from_query}=  To Json  ${resp.content}
-    Log to console  ${json_from_file}
-    Log to console  ${json_from_query}
     Dictionaries Should Be Equal  ${json_from_file}  ${json_from_query}
 
 Get Comics list
@@ -31,8 +29,6 @@ Get Characters
     Should Be Equal As Strings  ${resp.status_code}  200
     ${json_from_file}=  evaluate  json.loads(open("/opt/robotframework/tests/Characters.json", "r").read())  json
     ${json_from_query}=  To Json  ${resp.content}
-    Log to console  ${json_from_file}
-    Log to console  ${json_from_query}
     Lists Should Be Equal  ${json_from_file}  ${json_from_query}
 
 Get a bad route
