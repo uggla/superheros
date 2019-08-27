@@ -10,3 +10,6 @@
       stage: Build
       script:
         - docker-compose up -d
+      stage: Integration tests
+      script:
+        - cd robotframework && docker run --rm -v $(pwd)/reports:/opt/robotframework/reports:Z -v $(pwd)/tests:/opt/robotframework/tests:Z -e BROWSER=firefox --shm-size=2g --network=host ppodgorsek/robot-framework:latest
