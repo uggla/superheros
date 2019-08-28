@@ -1,18 +1,22 @@
----
-  language: minimal
-  sudo: required
-  notifications:
-    email: true
-  services:
-    - docker
-  jobs:
-    include:
-      - stage: Build
-        script:
-          - docker-compose up -d
-          - sleep 60s
-          - cd robotframework && docker run --rm -v $(pwd)/reports:/opt/robotframework/reports:Z -v $(pwd)/tests:/opt/robotframework/tests:Z -e BROWSER=firefox --shm-size=2g --network=host ppodgorsek/robot-framework:latest
-      # Keep the following lines as reference
-      # - stage: Integration tests
-      #   script:
-      #     - cd robotframework && docker run --rm -v $(pwd)/reports:/opt/robotframework/reports:Z -v $(pwd)/tests:/opt/robotframework/tests:Z -e BROWSER=firefox --shm-size=2g --network=host ppodgorsek/robot-framework:latest
+language: minimal
+sudo: required
+notifications:
+  email: true
+services:
+- docker
+jobs:
+  include:
+  - stage: Build
+    script:
+    - docker-compose up -d
+    - sleep 60s
+    - cd robotframework && docker run --rm -v $(pwd)/reports:/opt/robotframework/reports:Z
+      -v $(pwd)/tests:/opt/robotframework/tests:Z -e BROWSER=firefox --shm-size=2g
+      --network=host ppodgorsek/robot-framework:latest
+    - docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"
+    - docker tag superheros uggla/superheros
+    - docker push uggla/superheros
+env:
+  global:
+  - secure f1KsWFTIUpL7vJKkd203IzE/wlk/neXQ91S5lny1zNyDE+7j/JlDQsO1ZmRrnF8JIkPTipHLjU/hOeQJVnQrvncRli7zuiyPKhXH0ri7gh/R+swV6Zo8CjHRPL+JlXskfVOQAmhRglB5iSwTJRKmqD3XuUOgf3lRb1ZjmwScPrM2p8Yj/0BWZwkoqz8rrrCWf6i02ifKVtxwHPaMxg50zZ6i6qltcjkgndlWzjJPUh8zzFi2yG0EdmVb6Io7TDjbKsRK55R4MjPxXU0R5OLJEDJQ+uaO75nKK1cEJTlteixQmDfIkwYyFWJBYcNaIPHgSIX1P3CYYx8RiCWoAq0jyfWIVkjMb6n7rcKOcSbqkvONorT0NEpURPJgxI9dLcA4FsSECE5yKfMQ8MHMCe4DXtYgbg7U21QbMDouGagKhB8MgQqR9Pb9R4fG21G6h0EP0EROhP3T/FUPnAtRWTYJazIbqu7/LXe1O97hsQBC2FC7NKcuBWjgndXU713F8JYALTW6nmxTQDV0J/4Fnam41jchse3RCQKcIowuywhS5d+xL0MMvbHRrny06x+Zge2KuzNeSc10Wrk6I0YPmsCZwgDdef4tRZI3m4rZiHlA28t1p0sHmMjE5z2g9JjP6FKrboR5Rz2L6/qI7O3gKM88=
+  - secure: VVVLFWA0hWF64RaLVlE1Q2fnVbP4Os8Eh7W/OAaUW9yzlUazZOmhZQt3ziJJvkuKbxBhn+7Rmd8IDeHZneT1ElYNoLh+vLf/hMSB4Gt0d9ZMUMV+tEFxjwDhrDBeco8IahB9WDsY7UcDPrRPFLlQWo6dE1WeJ0Ql1FWs5VUSJwqq8ed8YvcJFYoxD25/svRJVyBMsBpkeEQaWcZAEhPpmuefS8e3OyaJCvxkL5exU/SG6UWD7q9fzHsebu2vPsgWvtSqCHxtxigR6q/jPyYrXwpi9l47PFUKoO9Nutlx1UIlXwAf5CTT+Jjn6uGXpmsByls/upbSYHFoVwcT5vLvzwDEz0E+02NV58PL2z63VNBA6yHjmun5Bj739I5HzYHVcFqpBKQBjCCnUsGKW6M0KaltkkZ3CIamXVzjGq9O32HdPFyW0K5FFzPvwpn6Q4O9eTs3gMS4eI+C9JSoiFg9tTVSTSaJD/7yod2eMAZCqKrZ5rhWKN6z/oOs8Oa74cnhxM1h7tw2bvPV73qpyvyiOf1e9xVqlI6ZV2OjaxHORnsJXliWtSQcdw80yB7J2Kh3JDvrouuqAMV5PJkCeIe/sc/9nCcn17L6Kcer3PYCFBgOoMMx4XV5bbOSWQiirW25f/l+gZWo84sfZBis5OHDPuIe4FaSsMUrbmvLmSJser8=
