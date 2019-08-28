@@ -16,6 +16,7 @@ services:
   superheros:
     build:
       context: .
+    image: superheros
     environment:
       POSTGRES_USER: superheros
       POSTGRES_PASSWORD: superheros
