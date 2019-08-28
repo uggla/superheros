@@ -1,4 +1,7 @@
+*.swp
 /target
 **/*.rs.bk
 *.zip
 *.xlsx
+robotframework/reports/*.html
+robotframework/reports/*.xml

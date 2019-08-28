@@ -1,0 +1,21 @@
+language: minimal
+sudo: required
+notifications:
+  email: true
+services:
+- docker
+jobs:
+  include:
+  - stage: Build
+    script:
+    - docker-compose up -d
+    - sleep 60s
+    - cd robotframework && docker run --rm -v $(pwd)/reports:/opt/robotframework/reports:Z
+      -v $(pwd)/tests:/opt/robotframework/tests:Z -e BROWSER=firefox --shm-size=2g
+      --network=host ppodgorsek/robot-framework:latest
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker push uggla/superheros
+env:
+  global:
+  - secure: gzsyVFn6p1qC2HpWez0zFKpyhC5NPEEDEIRVSJQGEPoS7Jzy9qlXtcyrnIoYObeKC+CDk9Nlzosn4q8XoV/C4YvqXXVtGxECsMaTueK2xnWOizjz7I4UIXwpT/6kh+BXz7FFrsA0aLbnTE56ysdT4HqAymx8utq1uEC1mUi1tagLXAWziJviD5h5nMKyTzw3vmdwlkMEVd8i4efeHkPM3dbj8ge3SgT9vdosCqi+6hW9lMq8fX/UnMR2odi0Y3w0eyfe0CWjnoxFFt3vL/B5HvlMpZlVvU2YqaEQNC/MJMZDQpOUKza3rEPNT+dvz3ZK8L85kqCJot933Xs9a6IaTddb8R3iWX7+Pz+/PbLXh4nB8FfQ+vOC+W2ABEZ1wQAXaBtIwH2ImwQvdj/h/TZtak71ADomGaK20eA+vzX8G8hVrd2AZw+7JUhPpUo90NMR3YAYLFpCdZWONWB6Q51IZD4TvnoP8ArvJSn043+aMSruMcMgtVfyiD/UEQoZeboORwstkb8LAZ4k7eW0ntQ7SYiA+RVBN18tkzxgdJN1Q2c44QtNEW5bpdYDn7nhnB4hiU3eUGrQOoFnFOA3sMJjQnd1rlOQigd0k6t1bfIQEGwzLNtKfs5qqBpVxvc7hETgKErEHOp3jfW4XZ40GtYulddYlh5s80SVy5hG7+ClR/o=
+  - secure: FT1sDsVZNrkWse+U3IW15oVMvODTy/rJPEdxzZe7WV6hjf0xenWJeqZCFhBklHJeXFnKmNw9PPteRli0g99oX345eaB7WnofWtzvh3Gvbk3Q04eq28Y3LXCQTXU4WH7ZI1Vkrk7iM/ZUTfEcHMjbuGrW48OlUJzvAYPbqb0o8gQD4MMe7putGuHofn5mgA+6BB+OB0WrasbHnxf7rw+4k6f3VNS/PEHnrwQskLeLXjVRf+8T2UnpigbfiQIHbPcAvbenx3g8XTEsIZWCG2jl78eaUolTfdZsDa6UCEgVRrtp1C+zZavmJn7xoWD+gNgLTuk6yZQTgGk2xq3x5dphb7FDC8CJZuclCwA+99zgOoww8bV8PS+OqytfJ/c9NPnXMDQqcT4a2WDEa23eIx6BbXmtKdxCNSo89KH3VTwKk14pGntZZH9nbQFtW2+T5F/5FF4/PIYJaJGHkgpbNg3Gke40BByM0xgFnplZLB3cQk2LsHIXrgGZtVPPjBiLNnMTqi2aqeizmbC3a9hSbZCoMkhoab4clUaJX3vjucOfsjfZaAkIrBbC+cReWXl/ebfPU2GpEp3P8qHWtaL43FCUlIZyk6UeucCwEm+DPFE8hDpz9CVP1GtDlzRV/bcwetzhe+Y3si1QRh98KAQGmeOn48sj9lXaK5V5YHOIGNePNE8=
