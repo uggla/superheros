@@ -4,7 +4,7 @@ Demo API written in Rust with Actix-web and Diesel.<br/>
 A simple Continuous Integration was configured as an example.
 <br/>
 <br/>
-
+[![Build Status](https://travis-ci.org/uggla/superheros.svg?branch=master)](https://travis-ci.org/uggla/superheros)
 
 ## Managing the application
 
