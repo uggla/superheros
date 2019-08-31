@@ -20,13 +20,13 @@ pub fn establish_connection() -> PgConnection {
 }
 
 //  r2d2_diesel
-pub struct ConnDsl(pub Pool<ConnectionManager<PgConnection>>);
+pub struct DbExecutor(pub Pool<ConnectionManager<PgConnection>>);
 
-impl Actor for ConnDsl {
+impl Actor for DbExecutor {
     type Context = SyncContext<Self>;
 }
 
-pub fn get_db_addr() -> Addr<ConnDsl> {
+pub fn get_db_addr() -> Addr<DbExecutor> {
     dotenv().ok(); // This will load our .env file.
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let manager = ConnectionManager::<PgConnection>::new(database_url);
@@ -35,6 +35,5 @@ pub fn get_db_addr() -> Addr<ConnDsl> {
         .max_size(12)
         .build(manager)
         .expect("Failed to create pool.");
-    dbg!(num_cpus::get());
-    SyncArbiter::start(num_cpus::get() * 3, move || ConnDsl(pool.clone()))
+    SyncArbiter::start(num_cpus::get() * 3, move || DbExecutor(pool.clone()))
 }

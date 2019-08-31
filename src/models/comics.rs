@@ -1,5 +1,5 @@
 use crate::db_connection::establish_connection;
-use crate::db_connection::ConnDsl;
+use crate::db_connection::DbExecutor;
 use crate::schema::characters;
 use crate::schema::characters_stats;
 use crate::schema::characters_to_comics;
@@ -22,11 +22,9 @@ pub struct Comics {
 }
 
 #[derive(Serialize, Deserialize)]
-// pub struct ComicsList(pub Vec<Comics>);
 pub struct ComicsList;
 
 impl Message for ComicsList {
-    // type Result = Result<ComicsListMsgs, Error>;
     type Result = io::Result<ComicsListMsgs>;
 }
 
@@ -37,24 +35,12 @@ pub struct ComicsListMsgs {
     pub comics_list: Vec<Comics>,
 }
 
-// impl From<r2d2::Error> for std::io::Error {
-//     fn from (_t:<r2d2::Error>) -> std::io::Error{
-//         std::io::Error
-//     }
-// }
-
-impl Handler<ComicsList> for ConnDsl {
-    // type Result = Result<ComicsListMsgs, Error>;
+impl Handler<ComicsList> for DbExecutor {
     type Result = io::Result<ComicsListMsgs>;
 
     fn handle(&mut self, _comics_list: ComicsList, _: &mut Self::Context) -> Self::Result {
-        // let conn = &self.0.get().map_err(error::ErrorInternalServerError)?;
         use crate::schema::comics::dsl::*;
-        let conn = &self.0.get().unwrap();
-        // let conn = &self
-        //     .0
-        //     .get()
-        //     .map_err(|e| Err(io::Error::new(io::ErrorKind::Other, e)));
+        let conn = &self.0.get().expect("Could not get a Db executor");
 
         let result = comics
             //.limit(10)
@@ -68,20 +54,6 @@ impl Handler<ComicsList> for ConnDsl {
         })
     }
 }
-
-//impl ComicsList {
-//    pub fn list() -> Self {
-//        use crate::schema::comics::dsl::*;
-//        let connection = establish_connection();
-
-//        let result = comics
-//            //.limit(10)
-//            .load::<Comics>(&connection)
-//            .expect("Error loading comics");
-
-//        ComicsList(result)
-//    }
-//}
 
 impl Comics {
     pub fn find(id: &i32) -> Result<Comics, diesel::result::Error> {
@@ -212,11 +184,6 @@ pub struct CharactersToComics {
 impl CharactersToComics {
     pub fn find() -> Result<Vec<(i32, i32)>, diesel::result::Error> {
         let connection = establish_connection();
-        // let data = characters_to_comics::table
-        //     .inner_join(comics::table.on(comics::id.eq(characters_to_comics::id)))
-        //     .select((comics::id, characters_to_comics::id))
-        //     .load(&connection);
-        // return data;
         characters_to_comics::table
             .inner_join(comics::table.on(comics::id.eq(characters_to_comics::id)))
             .select((comics::id, characters_to_comics::id))

@@ -17,14 +17,9 @@ mod logger;
 pub mod models;
 pub mod schema;
 
-// use actix::Addr;
 use actix_web::{web, App, HttpServer};
 use log::LevelFilter;
 use logger::init_log;
-
-// struct Mydata {
-//     db: Addr<db_connection::ConnDsl>,
-// }
 
 fn main() {
     init_log(LevelFilter::Debug).expect("Error initializing logger");
@@ -37,9 +32,6 @@ fn main() {
         App::new()
             .data(db_addr.clone())
             .service(web::resource("/").route(web::get().to_async(handlers::comics::superheros)))
-            // .service(
-            //     web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_index)),
-            // )
             .service(
                 web::resource("/Comics/{id}")
                     .route(web::get().to_async(handlers::comics::comics_show)),
@@ -52,12 +44,13 @@ fn main() {
                 web::resource("/Characters")
                     .route(web::get().to_async(handlers::comics::characters_stats)),
             )
-            .service(web::resource("/Comicspool").route(web::get().to_async(handlers::comics::add)))
+            .service(
+                web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_list)),
+            )
     })
     .bind("0.0.0.0:8088")
-    .unwrap()
+    .expect("Could not start web server !")
     .start();
 
-    //    println!("Started http server: 127.0.0.1:8088");
     let _ = sys.run();
 }

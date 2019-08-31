@@ -1,4 +1,4 @@
-use crate::db_connection::ConnDsl;
+use crate::db_connection::DbExecutor;
 use crate::models::comics::Characters;
 use crate::models::comics::CharactersList;
 use crate::models::comics::Comics;
@@ -23,11 +23,6 @@ pub fn superheros(_req: HttpRequest) -> HttpResponse {
     HttpResponse::Ok().json(data)
 }
 
-// pub fn comics_index(_req: HttpRequest) -> HttpResponse {
-//     info!("Request comics list");
-//     HttpResponse::Ok().json(ComicsList::list())
-// }
-
 pub fn comics_show(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
     info!("Request comics id: {}", &id);
     Comics::find(&id)
@@ -47,9 +42,9 @@ pub fn characters_stats(_req: HttpRequest) -> Result<HttpResponse, HttpResponse>
         .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
 }
 
-pub fn add(
+pub fn comics_list(
     _req: HttpRequest,
-    db: web::Data<Addr<ConnDsl>>,
+    db: web::Data<Addr<DbExecutor>>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(ComicsList)
         .from_err()
@@ -58,37 +53,3 @@ pub fn add(
             Err(_) => Ok(HttpResponse::InternalServerError().into()),
         })
 }
-
-//pub fn comics_index_pool(
-//    _req: HttpRequest,
-//    pool: web::Data<DbPool>,
-//) -> impl Future<Item = HttpResponse, Error = Error> {
-//    //info!("Request comics list pool");
-//    web::block(move || ComicsList::listpool(pool)).then(|res| match res {
-//        Ok(data) => Ok(HttpResponse::Ok().json(data)),
-//        Err(_) => Ok(HttpResponse::InternalServerError().into()),
-//    })
-//}
-//
-// Async request handler
-//
-
-// pub fn add(
-//     name: web::Path<String>,
-//     pool: web::Data<ConnDsl>,
-// ) -> impl Future<Item = HttpResponse, Error = Error> {
-//     // run diesel blocking code
-//     web::block(move || query(pool)).then(|res| match res {
-//         Ok(user) => Ok(HttpResponse::Ok().json(user)),
-//         Err(_) => Ok(HttpResponse::InternalServerError().into()),
-//     })
-// }
-
-// pub fn query(pool: web::Data<ConnDsl>) -> Result<Comics, diesel::result::Error> {
-//     use crate::schema::comics;
-//     use diesel::QueryDsl;
-//     use diesel::RunQueryDsl;
-//     let connection = &pool;
-
-//     comics::table.find(2).first(&connection)
-// }
