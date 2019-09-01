@@ -55,11 +55,51 @@ impl Handler<ComicsList> for DbExecutor {
     }
 }
 
-impl Comics {
-    pub fn find(id: &i32) -> Result<Comics, diesel::result::Error> {
-        let connection = establish_connection();
+// impl Comics {
+//     pub fn find(id: &i32) -> Result<Comics, diesel::result::Error> {
+//         let connection = establish_connection();
 
-        comics::table.find(id).first(&connection)
+//         comics::table.find(id).first(&connection)
+//     }
+// }
+#[derive(Serialize, Deserialize)]
+pub struct ComicsId {
+    pub comics_id: i32,
+}
+
+impl Message for ComicsId {
+    type Result = io::Result<ComicsIdMsgs>;
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ComicsIdMsgs {
+    pub status: i32,
+    pub message: String,
+    pub comics_id: Comics,
+}
+
+impl Handler<ComicsId> for DbExecutor {
+    type Result = io::Result<ComicsIdMsgs>;
+
+    fn handle(&mut self, comics: ComicsId, _: &mut Self::Context) -> Self::Result {
+        let conn = &self.0.get().expect("Could not get a Db executor");
+
+        // let result = comics::table.find(comics.comics_id).first(conn);
+
+        // Ok(ComicsIdMsgs {
+        //     status: 200,
+        //     message: "article_id result.".to_string(),
+        //     comics_id: result.unwrap(),
+        // })
+        let result = comics::table.find(comics.comics_id).first(conn);
+        match result {
+            Ok(result) => Ok(ComicsIdMsgs {
+                status: 200,
+                message: "article_id result.".to_string(),
+                comics_id: result,
+            }),
+            Err(_e) => Err(io::Error::new(io::ErrorKind::NotFound, "record not found")),
+        }
     }
 }
 
