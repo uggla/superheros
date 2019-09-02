@@ -45,7 +45,7 @@ impl Handler<ComicsList> for DbExecutor {
         let result = comics
             //.limit(10)
             .load::<Comics>(conn)
-            .expect("Error loading comics");
+            .expect("Error loading Comics");
 
         Ok(ComicsListMsgs {
             status: 200,
@@ -144,7 +144,7 @@ impl Handler<CharactersList> for DbExecutor {
         let result = characters
             //.limit(10)
             .load::<Characters>(conn)
-            .expect("Error loading characters");
+            .expect("Error loading Characters");
 
         Ok(CharactersListMsgs {
             status: 200,
@@ -231,9 +231,11 @@ impl Handler<CharactersJoinedToCharactersStats> for DbExecutor {
                 characters_stats::combat,
                 characters_stats::total,
             ))
-            .load(conn);
+            .load(conn)
+            .expect("Error loading CharactersJoinedToCharactersStats");
+
         for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
-            data.unwrap()
+            data
         {
             result.push(CharactersJoinedToCharactersStatsResult::new(
                 name,
