@@ -49,7 +49,7 @@ impl Handler<ComicsList> for DbExecutor {
 
         Ok(ComicsListMsgs {
             status: 200,
-            message: "article_list result.".to_string(),
+            message: "comics_list result.".to_string(),
             comics_list: result,
         })
     }
@@ -81,7 +81,7 @@ impl Handler<ComicsId> for DbExecutor {
         match result {
             Ok(result) => Ok(ComicsIdMsgs {
                 status: 200,
-                message: "article_id result.".to_string(),
+                message: "comics_id result.".to_string(),
                 comics_id: result,
             }),
             Err(e) => Err(io::Error::new(io::ErrorKind::NotFound, e)),
@@ -185,18 +185,48 @@ impl Characters {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct CharactersList(pub Vec<Characters>);
+pub struct CharactersList;
 
-impl CharactersList {
-    pub fn list() -> Self {
-        let connection = establish_connection();
+impl Message for CharactersList {
+    type Result = io::Result<CharactersListMsgs>;
+}
 
-        let result = characters::table
+#[derive(Serialize, Deserialize)]
+pub struct CharactersListMsgs {
+    pub status: i32,
+    pub message: String,
+    pub characters_list: Vec<Characters>,
+}
+
+//impl CharactersList {
+//    pub fn list() -> Self {
+//        let connection = establish_connection();
+
+//        let result = characters::table
+//            //.limit(10)
+//            .load::<Characters>(&connection)
+//            .expect("Error loading comics");
+
+//        CharactersList(result)
+//    }
+//}
+impl Handler<CharactersList> for DbExecutor {
+    type Result = io::Result<CharactersListMsgs>;
+
+    fn handle(&mut self, _characters_list: CharactersList, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::characters::dsl::*;
+        let conn = &self.0.get().expect("Could not get a Db executor");
+
+        let result = characters
             //.limit(10)
-            .load::<Characters>(&connection)
-            .expect("Error loading comics");
+            .load::<Characters>(conn)
+            .expect("Error loading characters");
 
-        CharactersList(result)
+        Ok(CharactersListMsgs {
+            status: 200,
+            message: "characters_list result.".to_string(),
+            characters_list: result,
+        })
     }
 }
 

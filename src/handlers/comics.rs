@@ -23,10 +23,10 @@ pub fn superheros(_req: HttpRequest) -> HttpResponse {
     HttpResponse::Ok().json(data)
 }
 
-pub fn characters_index(_req: HttpRequest) -> HttpResponse {
-    info!("Request characters list");
-    HttpResponse::Ok().json(CharactersList::list())
-}
+// pub fn characters_index(_req: HttpRequest) -> HttpResponse {
+//     info!("Request characters list");
+//     HttpResponse::Ok().json(CharactersList::list())
+// }
 
 pub fn characters_stats(_req: HttpRequest) -> Result<HttpResponse, HttpResponse> {
     info!("Request characters stats");
@@ -59,6 +59,21 @@ pub fn comics_show(
         .from_err()
         .and_then(move |res| match res {
             Ok(comics_id_msg) => Ok(HttpResponse::Ok().json(comics_id_msg.comics_id)),
+            Err(_) => Ok(HttpResponse::InternalServerError().into()),
+        })
+}
+
+pub fn characters_list(
+    _req: HttpRequest,
+    db: web::Data<Addr<DbExecutor>>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    info!("Request characters list");
+    db.send(CharactersList)
+        .from_err()
+        .and_then(move |res| match res {
+            Ok(characters_list_msg) => {
+                Ok(HttpResponse::Ok().json(characters_list_msg.characters_list))
+            }
             Err(_) => Ok(HttpResponse::InternalServerError().into()),
         })
 }

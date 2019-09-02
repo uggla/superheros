@@ -33,10 +33,6 @@ fn main() {
             .data(db_addr.clone())
             .service(web::resource("/").route(web::get().to_async(handlers::comics::superheros)))
             .service(
-                web::resource("/Characters/list")
-                    .route(web::get().to_async(handlers::comics::characters_index)),
-            )
-            .service(
                 web::resource("/Characters")
                     .route(web::get().to_async(handlers::comics::characters_stats)),
             )
@@ -46,6 +42,10 @@ fn main() {
             .service(
                 web::resource("/Comics/{id}")
                     .route(web::get().to_async(handlers::comics::comics_show)),
+            )
+            .service(
+                web::resource("/Characters/list")
+                    .route(web::get().to_async(handlers::comics::characters_list)),
             )
     })
     .bind("0.0.0.0:8088")
