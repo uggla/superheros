@@ -23,13 +23,6 @@ pub fn superheros(_req: HttpRequest) -> HttpResponse {
     HttpResponse::Ok().json(data)
 }
 
-// pub fn comics_show(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
-//     info!("Request comics id: {}", &id);
-//     Comics::find(&id)
-//         .map(|product| HttpResponse::Ok().json(product))
-//         .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
-// }
-
 pub fn characters_index(_req: HttpRequest) -> HttpResponse {
     info!("Request characters list");
     HttpResponse::Ok().json(CharactersList::list())
@@ -46,10 +39,11 @@ pub fn comics_list(
     _req: HttpRequest,
     db: web::Data<Addr<DbExecutor>>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
+    info!("Request comics list");
     db.send(ComicsList)
         .from_err()
         .and_then(move |res| match res {
-            Ok(comics_list) => Ok(HttpResponse::Ok().json(comics_list.comics_list)),
+            Ok(comics_list_msg) => Ok(HttpResponse::Ok().json(comics_list_msg.comics_list)),
             Err(_) => Ok(HttpResponse::InternalServerError().into()),
         })
 }
@@ -59,9 +53,12 @@ pub fn comics_show(
     db: web::Data<Addr<DbExecutor>>,
     id: web::Path<i32>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    let comics = ComicsId { comics_id: *id };
-    db.send(comics).from_err().and_then(move |res| match res {
-        Ok(comics) => Ok(HttpResponse::Ok().json(comics.comics_id)),
-        Err(_) => Ok(HttpResponse::InternalServerError().into()),
-    })
+    let comics_id = ComicsId { comics_id: *id };
+    info!("Request comics");
+    db.send(comics_id)
+        .from_err()
+        .and_then(move |res| match res {
+            Ok(comics_id_msg) => Ok(HttpResponse::Ok().json(comics_id_msg.comics_id)),
+            Err(_) => Ok(HttpResponse::InternalServerError().into()),
+        })
 }
