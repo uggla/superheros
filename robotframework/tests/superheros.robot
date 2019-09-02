@@ -35,3 +35,8 @@ Get a bad route
     Create Session  superheros  http://localhost:8088
     ${resp}=  Get Request  superheros  /bidule
     Should Be Equal As Strings  ${resp.status_code}  404
+
+Get a unknown id route
+    Create Session  superheros  http://localhost:8088
+    ${resp}=  Get Request  superheros  /Comics/1
+    Should Be Equal As Strings  ${resp.status_code}  500
