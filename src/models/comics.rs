@@ -109,82 +109,6 @@ pub struct CharactersStats {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct CharactersJoinedToCharactersStats {
-    pub name: String,
-    pub alignment: String,
-    pub intelligence: i32,
-    pub strengh: i32,
-    pub speed: i32,
-    pub durability: i32,
-    pub power: i32,
-    pub combat: i32,
-    pub total: i32,
-}
-
-impl CharactersJoinedToCharactersStats {
-    pub fn new(
-        name: String,
-        alignment: String,
-        intelligence: i32,
-        strengh: i32,
-        speed: i32,
-        durability: i32,
-        power: i32,
-        combat: i32,
-        total: i32,
-    ) -> CharactersJoinedToCharactersStats {
-        CharactersJoinedToCharactersStats {
-            name,
-            alignment,
-            intelligence,
-            strengh,
-            speed,
-            durability,
-            power,
-            combat,
-            total,
-        }
-    }
-}
-
-impl Characters {
-    pub fn find() -> Result<Vec<CharactersJoinedToCharactersStats>, diesel::result::Error> {
-        let connection = establish_connection();
-        let mut result = vec![];
-        let data = characters::table
-            .inner_join(characters_stats::table.on(characters_stats::name.eq(characters::name)))
-            .select((
-                characters::name,
-                characters_stats::alignment,
-                characters_stats::intelligence,
-                characters_stats::strengh,
-                characters_stats::speed,
-                characters_stats::durability,
-                characters_stats::power,
-                characters_stats::combat,
-                characters_stats::total,
-            ))
-            .load(&connection);
-        for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
-            data?
-        {
-            result.push(CharactersJoinedToCharactersStats::new(
-                name,
-                alignment,
-                intelligence,
-                strengh,
-                speed,
-                durability,
-                power,
-                combat,
-                total,
-            ));
-        }
-        Ok(result)
-    }
-}
-
-#[derive(Serialize, Deserialize)]
 pub struct CharactersList;
 
 impl Message for CharactersList {
@@ -229,6 +153,145 @@ impl Handler<CharactersList> for DbExecutor {
         })
     }
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct CharactersJoinedToCharactersStats;
+
+#[derive(Serialize, Deserialize)]
+pub struct CharactersJoinedToCharactersStatsResult {
+    pub name: String,
+    pub alignment: String,
+    pub intelligence: i32,
+    pub strengh: i32,
+    pub speed: i32,
+    pub durability: i32,
+    pub power: i32,
+    pub combat: i32,
+    pub total: i32,
+}
+
+impl CharactersJoinedToCharactersStatsResult {
+    pub fn new(
+        name: String,
+        alignment: String,
+        intelligence: i32,
+        strengh: i32,
+        speed: i32,
+        durability: i32,
+        power: i32,
+        combat: i32,
+        total: i32,
+    ) -> CharactersJoinedToCharactersStatsResult {
+        CharactersJoinedToCharactersStatsResult {
+            name,
+            alignment,
+            intelligence,
+            strengh,
+            speed,
+            durability,
+            power,
+            combat,
+            total,
+        }
+    }
+}
+
+impl Message for CharactersJoinedToCharactersStats {
+    type Result = io::Result<CharactersJoinedToCharactersStatsMsgs>;
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CharactersJoinedToCharactersStatsMsgs {
+    pub status: i32,
+    pub message: String,
+    pub characters_list: Vec<CharactersJoinedToCharactersStatsResult>,
+}
+
+impl Handler<CharactersJoinedToCharactersStats> for DbExecutor {
+    type Result = io::Result<CharactersJoinedToCharactersStatsMsgs>;
+
+    fn handle(
+        &mut self,
+        _characters_list: CharactersJoinedToCharactersStats,
+        _: &mut Self::Context,
+    ) -> Self::Result {
+        let conn = &self.0.get().expect("Could not get a Db executor");
+
+        let mut result = vec![];
+        let data = characters::table
+            .inner_join(characters_stats::table.on(characters_stats::name.eq(characters::name)))
+            .select((
+                characters::name,
+                characters_stats::alignment,
+                characters_stats::intelligence,
+                characters_stats::strengh,
+                characters_stats::speed,
+                characters_stats::durability,
+                characters_stats::power,
+                characters_stats::combat,
+                characters_stats::total,
+            ))
+            .load(conn);
+        for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
+            data.unwrap()
+        {
+            result.push(CharactersJoinedToCharactersStatsResult::new(
+                name,
+                alignment,
+                intelligence,
+                strengh,
+                speed,
+                durability,
+                power,
+                combat,
+                total,
+            ));
+        }
+
+        Ok(CharactersJoinedToCharactersStatsMsgs {
+            status: 200,
+            message: "CharactersJoinedToCharactersStats result.".to_string(),
+            characters_list: result,
+        })
+    }
+}
+
+// impl Characters {
+//     pub fn find() -> Result<Vec<CharactersJoinedToCharactersStats>, diesel::result::Error> {
+//         let connection = establish_connection();
+//         let mut result = vec![];
+//         let data = characters::table
+//             .inner_join(characters_stats::table.on(characters_stats::name.eq(characters::name)))
+//             .select((
+//                 characters::name,
+//                 characters_stats::alignment,
+//                 characters_stats::intelligence,
+//                 characters_stats::strengh,
+//                 characters_stats::speed,
+//                 characters_stats::durability,
+//                 characters_stats::power,
+//                 characters_stats::combat,
+//                 characters_stats::total,
+//             ))
+//             .load(&connection);
+//         for (name, alignment, intelligence, strengh, speed, durability, power, combat, total) in
+//             data?
+//         {
+//             result.push(CharactersJoinedToCharactersStats::new(
+//                 name,
+//                 alignment,
+//                 intelligence,
+//                 strengh,
+//                 speed,
+//                 durability,
+//                 power,
+//                 combat,
+//                 total,
+//             ));
+//         }
+//         Ok(result)
+//     }
+// }
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct CharactersToComics {

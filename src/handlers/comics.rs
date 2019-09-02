@@ -1,5 +1,5 @@
 use crate::db_connection::DbExecutor;
-use crate::models::comics::Characters;
+use crate::models::comics::CharactersJoinedToCharactersStats;
 use crate::models::comics::CharactersList;
 use crate::models::comics::ComicsId;
 use crate::models::comics::ComicsList;
@@ -28,12 +28,12 @@ pub fn superheros(_req: HttpRequest) -> HttpResponse {
 //     HttpResponse::Ok().json(CharactersList::list())
 // }
 
-pub fn characters_stats(_req: HttpRequest) -> Result<HttpResponse, HttpResponse> {
-    info!("Request characters stats");
-    Characters::find()
-        .map(|data| HttpResponse::Ok().json(data))
-        .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
-}
+// pub fn characters_stats(_req: HttpRequest) -> Result<HttpResponse, HttpResponse> {
+//     info!("Request characters stats");
+//     Characters::find()
+//         .map(|data| HttpResponse::Ok().json(data))
+//         .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+// }
 
 pub fn comics_list(
     _req: HttpRequest,
@@ -73,6 +73,21 @@ pub fn characters_list(
         .and_then(move |res| match res {
             Ok(characters_list_msg) => {
                 Ok(HttpResponse::Ok().json(characters_list_msg.characters_list))
+            }
+            Err(_) => Ok(HttpResponse::InternalServerError().into()),
+        })
+}
+
+pub fn characters_stats(
+    _req: HttpRequest,
+    db: web::Data<Addr<DbExecutor>>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    info!("Request characters stats");
+    db.send(CharactersJoinedToCharactersStats)
+        .from_err()
+        .and_then(move |res| match res {
+            Ok(characters_stats_msg) => {
+                Ok(HttpResponse::Ok().json(characters_stats_msg.characters_list))
             }
             Err(_) => Ok(HttpResponse::InternalServerError().into()),
         })
