@@ -1,4 +1,4 @@
-FROM rust:1.37 AS builder
+FROM rust:1.38 AS builder
 RUN mkdir -p /usr/local/src
 RUN groupadd -g 1000 rust \
     && useradd -u 1000 -g 1000 -s /bin/bash rust
