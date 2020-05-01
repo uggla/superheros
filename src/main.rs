@@ -25,12 +25,15 @@ fn main() {
     init_log(LevelFilter::Debug).expect("Error initializing logger");
 
     let sys = actix::System::new("superheros");
+    let db_addr = db_connection::get_db_addr();
+
     info!("Superheros API !!!");
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
+            .data(db_addr.clone())
             .service(web::resource("/").route(web::get().to_async(handlers::comics::superheros)))
             .service(
-                web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_index)),
+                web::resource("/Comics").route(web::get().to_async(handlers::comics::comics_list)),
             )
             .service(
                 web::resource("/Comics/{id}")
@@ -38,7 +41,7 @@ fn main() {
             )
             .service(
                 web::resource("/Characters/list")
-                    .route(web::get().to_async(handlers::comics::characters_index)),
+                    .route(web::get().to_async(handlers::comics::characters_list)),
             )
             .service(
                 web::resource("/Characters")
@@ -46,9 +49,8 @@ fn main() {
             )
     })
     .bind("0.0.0.0:8088")
-    .unwrap()
+    .expect("Could not start web server !")
     .start();
 
-    //    println!("Started http server: 127.0.0.1:8088");
     let _ = sys.run();
 }

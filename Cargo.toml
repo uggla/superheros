@@ -10,10 +10,12 @@ chrono = "*"
 dotenv = "*"
 futures = "*"
 log = "*"
+num_cpus = "*"
+postgres = "*"
 serde = "*"
 serde_derive = "*"
 serde_json = "*"
 
 [dependencies.diesel]
-features = ["postgres"]
+features = ["postgres", "r2d2"]
 version = "1.4.2"
