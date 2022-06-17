@@ -18,4 +18,4 @@ serde_json = "*"
 
 [dependencies.diesel]
 features = ["postgres", "r2d2"]
-version = "1.4.2"
+version = "1.4.6"
